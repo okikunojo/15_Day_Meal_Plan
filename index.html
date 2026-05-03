@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>15-Day 2MAD Meal Plan — ₱1,500 Budget</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f3;
+    --surface: #ffffff;
+    --surface2: #f3f0e8;
+    --border: #e0dbd0;
+    --text: #1a1814;
+    --muted: #6b6560;
+    --accent: #2d6a4f;
+    --accent2: #52b788;
+    --accent-light: #d8f3dc;
+    --warn: #c77d2a;
+    --warn-light: #fef3e2;
+    --protein: #4a90c4;
+    --carbs: #e8a045;
+    --fat: #7a6abf;
+    --cal: #e07070;
+    --water: #3d9db5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--accent);
+    color: white;
+    padding: 2rem 2rem 1.5rem;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  header p { font-size: 0.82rem; opacity: 0.8; margin-top: 2px; }
+  .header-row {
+    display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .day-nav {
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  }
+  .day-btn {
+    width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.4);
+    background: transparent; color: white; font-size: 0.75rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  .day-btn:hover { background: rgba(255,255,255,0.2); }
+  .day-btn.active { background: white; color: var(--accent); border-color: white; }
+  .day-btn.logged { background: rgba(82,183,136,0.4); border-color: var(--accent2); }
+
+  /* LAYOUT */
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem; font-weight: 400;
+  }
+  .card-body { padding: 1.25rem; }
+
+  /* MEAL CARDS */
+  .meal-section { margin-bottom: 1.25rem; }
+  .meal-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem;
+  }
+  .meal-block {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+  }
+  .meal-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem; color: var(--text); margin-bottom: 4px;
+    font-style: italic;
+  }
+  .meal-items { font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+  .meal-macros {
+    display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;
+  }
+  .macro-pill {
+    font-size: 0.72rem; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.02em;
+  }
+  .mp-cal { background: #fce8e8; color: #b34444; }
+  .mp-p { background: #e3f0fa; color: #2a6090; }
+  .mp-c { background: #fef3e2; color: #9a5c12; }
+  .mp-f { background: #ede9f7; color: #4a3a8c; }
+
+  .meal-tip {
+    font-size: 0.78rem; color: var(--accent); margin-top: 8px;
+    padding: 6px 10px; background: var(--accent-light);
+    border-radius: 8px; line-height: 1.5;
+  }
+
+  /* LOG BUTTON */
+  .log-btn {
+    width: 100%; margin-top: 10px; padding: 8px;
+    border: 1.5px solid var(--accent); border-radius: 8px;
+    background: transparent; color: var(--accent);
+    font-size: 0.82rem; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .log-btn:hover { background: var(--accent); color: white; }
+  .log-btn.logged { background: var(--accent); color: white; }
+
+  /* MACRO TARGETS */
+  .macro-bar-group { margin-bottom: 1rem; }
+  .macro-bar-label {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.8rem; margin-bottom: 5px;
+  }
+  .macro-bar-label span:first-child { font-weight: 500; }
+  .macro-bar-label span:last-child { color: var(--muted); font-size: 0.75rem; }
+  .bar-track {
+    height: 8px; background: var(--surface2);
+    border-radius: 4px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .bar-fill {
+    height: 100%; border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .bf-cal { background: var(--cal); }
+  .bf-p { background: var(--protein); }
+  .bf-c { background: var(--carbs); }
+  .bf-f { background: var(--fat); }
+  .bf-water { background: var(--water); }
+
+  /* WATER LOG */
+  .water-row { display: flex; gap: 8px; align-items: center; margin-top: 0.5rem; }
+  .water-input {
+    flex: 1; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+  }
+  .water-input:focus { outline: none; border-color: var(--water); }
+  .water-btn {
+    padding: 8px 14px; border-radius: 8px;
+    border: 1.5px solid var(--water);
+    background: transparent; color: var(--water);
+    font-size: 0.82rem; font-weight: 500; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .water-btn:hover { background: var(--water); color: white; }
+  .water-log-list { font-size: 0.78rem; color: var(--muted); margin-top: 8px; max-height: 80px; overflow-y: auto; }
+  .water-entry { padding: 3px 0; border-bottom: 1px dashed var(--border); }
+
+  /* DAILY SUMMARY */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.75rem; }
+  .sum-card {
+    background: var(--surface2); border-radius: 10px; padding: 10px 12px;
+    border: 1px solid var(--border); text-align: center;
+  }
+  .sum-val { font-size: 1.2rem; font-weight: 600; }
+  .sum-lbl { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  /* SHOPPING / TIPS */
+  .tip-box {
+    background: var(--warn-light);
+    border: 1px solid #f0c070;
+    border-radius: 10px; padding: 10px 12px;
+    font-size: 0.8rem; line-height: 1.6; margin-top: 0.75rem;
+    color: #6b4a10;
+  }
+
+  /* BUDGET OVERVIEW */
+  .budget-bar {
+    height: 10px; background: var(--surface2); border-radius: 5px;
+    border: 1px solid var(--border); overflow: hidden; margin: 8px 0;
+  }
+  .budget-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 5px; transition: width 0.5s;
+  }
+
+  /* INGREDIENT BADGE */
+  .ingredient-reuse {
+    display: inline-block; font-size: 0.68rem; background: #e3f0fa;
+    color: #2a6090; padding: 2px 7px; border-radius: 4px; margin: 2px;
+  }
+
+  /* TABS */
+  .tab-row { display: flex; gap: 4px; padding: 0.75rem 1.25rem 0; }
+  .tab {
+    padding: 6px 14px; border-radius: 8px 8px 0 0;
+    font-size: 0.8rem; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent; border-bottom: none;
+    transition: all 0.2s; color: var(--muted);
+  }
+  .tab.active { background: var(--surface); border-color: var(--border); color: var(--text); }
+  .tab:not(.active):hover { background: var(--surface2); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* NOTES AREA */
+  .notes-area {
+    width: 100%; padding: 10px; border: 1px solid var(--border);
+    border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.83rem; resize: vertical; min-height: 80px;
+    background: var(--surface);
+  }
+  .notes-area:focus { outline: none; border-color: var(--accent); }
+  .save-notes-btn {
+    margin-top: 6px; padding: 7px 16px;
+    border: 1.5px solid var(--accent); border-radius: 8px;
+    background: transparent; color: var(--accent);
+    font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .save-notes-btn:hover { background: var(--accent); color: white; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 10px 20px;
+    border-radius: 24px; font-size: 0.83rem; font-weight: 500;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.95rem; color: var(--accent); margin-bottom: 0.75rem;
+    padding-bottom: 4px; border-bottom: 1px solid var(--accent-light);
+  }
+
+  .shopping-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .shop-item {
+    font-size: 0.78rem; padding: 4px 10px;
+    border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text);
+  }
+  .shop-item.key { background: var(--accent-light); border-color: var(--accent2); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div>
+      <h1>15-Day 2MAD Meal Plan 🇵🇭</h1>
+      <p>₱1,500 budget · 1,824 kcal/day · Low-salt · No refrigerator needed</p>
+    </div>
+    <div class="day-nav" id="dayNav"></div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Daily Meal Plan -->
+  <div>
+    <div class="card">
+      <div class="tab-row" id="tabRow">
+        <div class="tab active" onclick="switchTab('meals')">Today's Meals</div>
+        <div class="tab" onclick="switchTab('shopping')">Shopping List</div>
+        <div class="tab" onclick="switchTab('notes')">Notes</div>
+      </div>
+
+      <!-- MEALS TAB -->
+      <div class="tab-content active card-body" id="tab-meals">
+        <div id="mealContent"></div>
+      </div>
+
+      <!-- SHOPPING TAB -->
+      <div class="tab-content card-body" id="tab-shopping">
+        <p class="section-title">Master Grocery List (Full 15 Days)</p>
+        <div class="shopping-grid">
+          <span class="shop-item key">Rice, 5kg</span>
+          <span class="shop-item key">Whole chicken (2–3 pcs, buy fresh)</span>
+          <span class="shop-item key">Eggs (3 dozen)</span>
+          <span class="shop-item key">Sardines in tomato (10 cans)</span>
+          <span class="shop-item key">Mongo/mung beans, 1kg</span>
+          <span class="shop-item key">Kamote (sweet potato), 2kg</span>
+          <span class="shop-item">Garlic, 3 heads</span>
+          <span class="shop-item">Onion, 1kg</span>
+          <span class="shop-item">Ginger, 200g</span>
+          <span class="shop-item">Tomatoes, 1kg</span>
+          <span class="shop-item">Kangkong, 3 bundles</span>
+          <span class="shop-item">Malunggay leaves, 2 bundles</span>
+          <span class="shop-item">Pechay, 3 bundles</span>
+          <span class="shop-item">Sitaw (string beans), 2 bundles</span>
+          <span class="shop-item">Ampalaya, 2 pcs</span>
+          <span class="shop-item">Banana saba (1 bunch)</span>
+          <span class="shop-item">Vinegar, 1 bottle</span>
+          <span class="shop-item">Soy sauce (low sodium), 1 bottle</span>
+          <span class="shop-item">Cooking oil, 500ml</span>
+          <span class="shop-item">Bay leaves, pepper (pantry)</span>
+          <span class="shop-item">Tofu (1 block per week)</span>
+          <span class="shop-item">Dried dilis (small pack)</span>
+        </div>
+        <div class="tip-box" style="margin-top:12px;">
+          💡 <strong>Budget tip:</strong> Buy chicken whole — use meat for Day 1 adobo, bones + leftover meat for Day 2 tinola. This is like a <em>nose-to-tail relay race</em> — every ingredient passes its baton to the next meal.
+        </div>
+        <p class="section-title" style="margin-top:16px;">Weekly Budget Breakdown</p>
+        <div style="font-size:0.82rem; line-height:2;">
+          <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--border);">
+            <span>Week 1 groceries (Days 1–8)</span><span style="font-weight:600;">₱780</span></div>
+          <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--border);">
+            <span>Week 2 fresh top-up (Days 9–15)</span><span style="font-weight:600;">₱520</span></div>
+          <div style="display:flex;justify-content:space-between;padding-top:4px;">
+            <span><strong>Total</strong></span><span style="font-weight:700;color:var(--accent);">₱1,300</span></div>
+          <div style="color:var(--muted);font-size:0.75rem;margin-top:4px;">₱200 buffer for condiments / cooking gas</div>
+        </div>
+      </div>
+
+      <!-- NOTES TAB -->
+      <div class="tab-content card-body" id="tab-notes">
+        <p class="section-title">Day Notes & Observations</p>
+        <textarea class="notes-area" id="notesArea" placeholder="How did today's meals feel? Energy levels? Any substitutions?"></textarea>
+        <button class="save-notes-btn" onclick="saveNotes()">Save Notes</button>
+        <div id="savedNotesList" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Tracker -->
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+
+    <!-- DAILY MACRO PROGRESS -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Today's Progress</h2>
+        <span id="dayLabel" style="font-size:0.8rem;color:var(--muted);"></span>
+      </div>
+      <div class="card-body">
+        <div class="summary-grid">
+          <div class="sum-card">
+            <div class="sum-val" id="totalCal" style="color:var(--cal);">0</div>
+            <div class="sum-lbl">kcal / 1,824</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val" id="totalProtein" style="color:var(--protein);">0g</div>
+            <div class="sum-lbl">protein / 111g</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val" id="totalCarbs" style="color:var(--carbs);">0g</div>
+            <div class="sum-lbl">carbs / 243g</div>
+          </div>
+          <div class="sum-card">
+            <div class="sum-val" id="totalFat" style="color:var(--fat);">0g</div>
+            <div class="sum-lbl">fat / 52g</div>
+          </div>
+        </div>
+
+        <div style="margin-top:1.1rem;">
+          <div class="macro-bar-group">
+            <div class="macro-bar-label"><span style="color:var(--cal);">Calories</span><span id="pctCal">0%</span></div>
+            <div class="bar-track"><div class="bar-fill bf-cal" id="barCal" style="width:0%"></div></div>
+          </div>
+          <div class="macro-bar-group">
+            <div class="macro-bar-label"><span style="color:var(--protein);">Protein</span><span id="pctP">0%</span></div>
+            <div class="bar-track"><div class="bar-fill bf-p" id="barP" style="width:0%"></div></div>
+          </div>
+          <div class="macro-bar-group">
+            <div class="macro-bar-label"><span style="color:var(--carbs);">Carbs</span><span id="pctC">0%</span></div>
+            <div class="bar-track"><div class="bar-fill bf-c" id="barC" style="width:0%"></div></div>
+          </div>
+          <div class="macro-bar-group">
+            <div class="macro-bar-label"><span style="color:var(--fat);">Fat</span><span id="pctF">0%</span></div>
+            <div class="bar-track"><div class="bar-fill bf-f" id="barF" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <div class="macro-bar-label"><span style="color:var(--water);">💧 Water</span><span id="pctWater">0 / 2,000ml</span></div>
+          <div class="bar-track"><div class="bar-fill bf-water" id="barWater" style="width:0%"></div></div>
+          <div class="water-row">
+            <input type="number" class="water-input" id="waterInput" placeholder="ml (e.g. 250)" min="0" max="2000">
+            <button class="water-btn" onclick="logWater()">+ Log</button>
+          </div>
+          <div class="water-log-list" id="waterLogList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STREAK -->
+    <div class="card">
+      <div class="card-header"><h2>15-Day Streak</h2></div>
+      <div class="card-body">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="streakDots"></div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-top:8px;">
+          🟢 Both meals logged &nbsp; 🟡 Partial &nbsp; ⚪ Not started
+        </div>
+      </div>
+    </div>
+
+    <!-- HEALTH NOTES -->
+    <div class="card">
+      <div class="card-header"><h2>Your Profile</h2></div>
+      <div class="card-body" style="font-size:0.82rem;line-height:2;color:var(--muted);">
+        <div>⚖️ Weight: <strong style="color:var(--text);">53 kg</strong></div>
+        <div>📏 Height: <strong style="color:var(--text);">168 cm</strong></div>
+        <div>🔥 Target: <strong style="color:var(--cal);">1,824 kcal/day</strong></div>
+        <div>🥩 Protein: <strong style="color:var(--protein);">111g/day</strong></div>
+        <div>🍚 Carbs: <strong style="color:var(--carbs);">243g/day</strong></div>
+        <div>🫒 Fat: <strong style="color:var(--fat);">52g/day</strong></div>
+        <div>🧂 Salt: <strong>low-sodium focus</strong></div>
+        <div>💰 Budget: <strong style="color:var(--accent);">₱1,500 / 15 days</strong></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TARGETS = { cal: 1824, protein: 111, carbs: 243, fat: 52, water: 2000 };
+
+const MEALS = [
+  {
+    day: 1,
+    lunch: {
+      name: "Sinangag na Kanin + Itlog na Prito",
+      items: "2 cups garlic fried rice, 2 pan-fried eggs, sliced tomatoes with vinegar",
+      cal: 580, protein: 22, carbs: 90, fat: 18,
+      tip: "Use leftover rice or freshly cooked. Egg is your affordable protein anchor — think of it as your daily 'foundation stone'."
+    },
+    dinner: {
+      name: "Chicken Adobo + Kanin",
+      items: "½ chicken (thighs/legs), vinegar, garlic, low-sodium soy, bay leaf, 1.5 cups rice, sautéed kangkong",
+      cal: 1244, protein: 89, carbs: 153, fat: 34,
+      tip: "Cook a WHOLE chicken. Use half today. Keep the rest in adobo sauce — it's self-preserving without a fridge (the vinegar & soy protect it for up to 24hrs at room temp)."
+    }
+  },
+  {
+    day: 2,
+    lunch: {
+      name: "Adobo Fried Rice",
+      items: "Leftover adobo chicken shredded into garlic rice, 1 egg, 1 cup rice",
+      cal: 620, protein: 38, carbs: 82, fat: 20,
+      tip: "Yesterday's adobo becomes today's lunch — like a time capsule that tastes even better the next day."
+    },
+    dinner: {
+      name: "Tinolang Manok + Kanin",
+      items: "Chicken carcass + remaining meat, ginger, garlic, malunggay leaves, green papaya (if available), 1.5 cups rice",
+      cal: 1204, protein: 73, carbs: 161, fat: 32,
+      tip: "Those adobo bones transform into clear tinola broth — a complete 180° flavor flip using the same bird."
+    }
+  },
+  {
+    day: 3,
+    lunch: {
+      name: "Ginisang Mongo + Kanin",
+      items: "1 cup mung beans, sautéed with garlic/onion/tomato, ½ cup dilis, 1.5 cups rice",
+      cal: 720, protein: 38, carbs: 122, fat: 12,
+      tip: "Mongo is your budget superfood — like a protein-loaded savings account costing ₱20/cup."
+    },
+    dinner: {
+      name: "Sardinas Guisado + Kamote",
+      items: "2 cans sardines in tomato sauce, sautéed onion/tomato, 1 boiled kamote (200g), pechay on the side",
+      cal: 1104, protein: 73, carbs: 121, fat: 40,
+      tip: "Kamote replaces rice tonight — same energy, more fiber, plus natural sweetness that balances the sardine sauce."
+    }
+  },
+  {
+    day: 4,
+    lunch: {
+      name: "Mongo Soup + Kanin",
+      items: "Leftover mongo (re-boiled with water), 1.5 cups rice, sliced tomato",
+      cal: 590, protein: 31, carbs: 105, fat: 8,
+      tip: "Mongo stores well — reheat with a splash of water and it's like a fresh batch."
+    },
+    dinner: {
+      name: "Ginisang Ampalaya con Itlog + Kanin",
+      items: "1 ampalaya sliced, 3 eggs scrambled, garlic, onion, tomato, 1.5 cups rice",
+      cal: 1234, protein: 80, carbs: 138, fat: 44,
+      tip: "Ampalaya + egg is the classic bitter-sweet pair — the bitterness signals liver-boosting compounds. Consider it your daily detox team."
+    }
+  },
+  {
+    day: 5,
+    lunch: {
+      name: "Kamoteng Lugaw",
+      items: "Rice porridge with kamote cubes, ginger, garlic, topped with crispy dilis",
+      cal: 540, protein: 18, carbs: 102, fat: 10,
+      tip: "Lugaw stretches rice further — 1 cup rice feeds you like 1.5 cups because it absorbs water."
+    },
+    dinner: {
+      name: "Ginisang Kangkong + Tofu + Kanin",
+      items: "Pan-fried firm tofu cubes, kangkong, garlic, low-sodium soy, 1.5 cups rice",
+      cal: 1284, protein: 93, carbs: 141, fat: 42,
+      tip: "Tofu is like a protein sponge — it absorbs whatever flavor you give it. Fry until golden for crispy exterior."
+    }
+  },
+  {
+    day: 6,
+    lunch: {
+      name: "Itlog na Prito + Sinangag",
+      items: "3 fried eggs, garlic rice 1.5 cups, sliced tomato + onion salad with calamansi/vinegar",
+      cal: 620, protein: 24, carbs: 91, fat: 24,
+      tip: "Simple but complete. The tomato-onion salad acts as a fresh counterpoint — zero salt needed with calamansi acidity."
+    },
+    dinner: {
+      name: "Sardinas sa Sitaw + Kanin",
+      items: "2 cans sardines, string beans (sitaw) chopped, tomato, garlic, 1.5 cups rice",
+      cal: 1204, protein: 87, carbs: 152, fat: 38,
+      tip: "Sitaw and sardines is a one-pan 15-min dinner — like a Filipino primavera on a budget."
+    }
+  },
+  {
+    day: 7,
+    lunch: {
+      name: "Giniling na Dilis + Kanin",
+      items: "Dried dilis pan-fried with garlic, vinegar, chili (optional), rice 1.5 cups, tomato",
+      cal: 560, protein: 34, carbs: 85, fat: 14,
+      tip: "Dilis is calcium-dense — eating them whole (bones included) is like a natural supplement tablet."
+    },
+    dinner: {
+      name: "Chicken Adobo Round 2 + Kangkong + Kanin",
+      items: "½ fresh chicken adobo, blanched kangkong, 1.5 cups rice",
+      cal: 1264, protein: 77, carbs: 158, fat: 38,
+      tip: "New chicken purchase for the second week. Same smart prep — cook full chicken, relay into Day 8."
+    }
+  },
+  {
+    day: 8,
+    lunch: {
+      name: "Adobo Flakes + Sinangag",
+      items: "Leftover adobo chicken shredded & pan-crisped, garlic rice, egg",
+      cal: 650, protein: 42, carbs: 86, fat: 22,
+      tip: "Crisping the shredded adobo adds a new texture dimension — same ingredients, totally different experience."
+    },
+    dinner: {
+      name: "Chicken Tinola + Malunggay + Kanin",
+      items: "Chicken carcass broth, malunggay, ginger, fish sauce (minimal), 1.5 cups rice",
+      cal: 1174, protein: 69, carbs: 155, fat: 30,
+      tip: "Malunggay is the most nutrient-dense leaf you can buy for ₱5 — iron, calcium, vitamin C in one bundle."
+    }
+  },
+  {
+    day: 9,
+    lunch: {
+      name: "Ginisang Mongo at Dilis + Kanin",
+      items: "1 cup mung beans, dilis, spinach/kangkong, 1.5 cups rice",
+      cal: 700, protein: 40, carbs: 116, fat: 13,
+      tip: "Week 2 mongo batch. This time add a handful of kangkong leaves at the end for color and iron."
+    },
+    dinner: {
+      name: "Tortang Talong + Kanin",
+      items: "2 eggplants grilled/roasted, 3 eggs, garlic, onion, 1.5 cups rice, tomato salad",
+      cal: 1124, protein: 71, carbs: 127, fat: 39,
+      tip: "Torta ng talong — char the eggplant directly over flame for a smoky depth that elevates this simple dish."
+    }
+  },
+  {
+    day: 10,
+    lunch: {
+      name: "Kamote + Itlog + Kanin",
+      items: "Boiled kamote 200g, 2 boiled eggs, rice 1 cup, sliced tomato",
+      cal: 540, protein: 22, carbs: 92, fat: 12,
+      tip: "Boiled egg + kamote is the perfect marathon meal — slow-release energy like a steady drip, not a spike."
+    },
+    dinner: {
+      name: "Ginisang Pechay at Tofu + Kanin",
+      items: "1 block firm tofu, pechay, garlic, ginger, low-sodium soy, 1.5 cups rice",
+      cal: 1284, protein: 89, carbs: 141, fat: 40,
+      tip: "Tofu + pechay is your cleanest, lightest dinner of the week — great for gut rest mid-plan."
+    }
+  },
+  {
+    day: 11,
+    lunch: {
+      name: "Sardinas at Kamote + Kanin",
+      items: "2 cans sardines, mashed kamote on the side, rice 1.5 cups",
+      cal: 740, protein: 52, carbs: 100, fat: 26,
+      tip: "Sardines + mashed kamote is like a Filipino version of fish & chips — hearty, filling, ₱30 total."
+    },
+    dinner: {
+      name: "Ginisang Ampalaya at Dilis + Kanin",
+      items: "1 ampalaya, dried dilis, garlic, tomato, 2 eggs, 1.5 cups rice",
+      cal: 1084, protein: 59, carbs: 143, fat: 34,
+      tip: "This dinner hits all the marks: bitter (ampalaya), umami (dilis), protein (egg) — complete flavor coverage."
+    }
+  },
+  {
+    day: 12,
+    lunch: {
+      name: "Sinangag + Itlog + Dilis",
+      items: "Garlic fried rice, 2 eggs, pan-fried dilis, sliced tomato",
+      cal: 580, protein: 30, carbs: 88, fat: 18,
+      tip: "Classic bangsilog-style breakfast-for-lunch — your energy reset midway through the plan."
+    },
+    dinner: {
+      name: "Ginisang Mongo at Sitaw + Kanin",
+      items: "Mung beans with string beans (sitaw), garlic, tomato, 1.5 cups rice, kangkong",
+      cal: 1244, protein: 81, carbs: 155, fat: 14,
+      tip: "All-vegetable dinner — your body will thank you. Low fat, high fiber, and deeply satisfying."
+    }
+  },
+  {
+    day: 13,
+    lunch: {
+      name: "Boiled Banana Saba + Itlog",
+      items: "3 saba bananas boiled, 2 eggs any style, small rice 1 cup",
+      cal: 580, protein: 20, carbs: 103, fat: 14,
+      tip: "Saba banana is fiber-dense and filling — it expands in your stomach like a slow-release cushion."
+    },
+    dinner: {
+      name: "Adobo Manok (Final Round) + Malunggay + Kanin",
+      items: "½ chicken adobo (3rd chicken for the plan), malunggay stirred into sauce, 1.5 cups rice",
+      cal: 1244, protein: 91, carbs: 153, fat: 38,
+      tip: "Add malunggay directly to your adobo pot in the last 2 minutes — it wilts beautifully and adds nutrients to the sauce."
+    }
+  },
+  {
+    day: 14,
+    lunch: {
+      name: "Chicken Arroz Caldo",
+      items: "Chicken bones + bits from adobo, glutinous rice or regular rice (more water), ginger, garlic, topped with egg",
+      cal: 620, protein: 44, carbs: 88, fat: 18,
+      tip: "Arroz caldo is just congee — stretch your remaining chicken further with extra water and double the ginger."
+    },
+    dinner: {
+      name: "Pinakbet + Kanin",
+      items: "Ampalaya, sitaw, eggplant, tomato, garlic, 2 tablespoons bagoong (use sparingly for low-salt), 1.5 cups rice",
+      cal: 1204, protein: 67, carbs: 155, fat: 34,
+      tip: "Pinakbet is the ultimate vegetable relay race — everything left in your produce stock goes in one pan."
+    }
+  },
+  {
+    day: 15,
+    lunch: {
+      name: "Ginisang Kamote Tops + Itlog + Kanin",
+      items: "Kamote leaves (if available) or kangkong, 3 eggs, garlic, vinegar dressing, rice 1.5 cups",
+      cal: 620, protein: 26, carbs: 98, fat: 20,
+      tip: "Kamote tops (talbos) are free if you grow the tubers — a zero-cost vegetable reward on Day 15."
+    },
+    dinner: {
+      name: "Celebration: Sardinas + Mongo + Kanin",
+      items: "2 cans sardines, mongo soup, 1.5 cups rice, boiled saba banana for dessert",
+      cal: 1204, protein: 85, carbs: 145, fat: 32,
+      tip: "15 days done! You've proven that ₱100/day can be nutritious, varied, and delicious. Same core ingredients, infinite creativity."
+    }
+  }
+];
+
+let currentDay = 1;
+let loggedMeals = JSON.parse(localStorage.getItem('loggedMeals') || '{}');
+let waterLogs = JSON.parse(localStorage.getItem('waterLogs') || '{}');
+let savedNotes = JSON.parse(localStorage.getItem('savedNotes') || '{}');
+
+function getTodayKey() { return `day${currentDay}`; }
+
+function buildDayNav() {
+  const nav = document.getElementById('dayNav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= 15; i++) {
+    const key = `day${i}`;
+    const logged = loggedMeals[key];
+    let cls = 'day-btn';
+    if (i === currentDay) cls += ' active';
+    else if (logged && (logged.lunch || logged.dinner)) cls += ' logged';
+    const btn = document.createElement('button');
+    btn.className = cls;
+    btn.textContent = i;
+    btn.onclick = () => { currentDay = i; renderAll(); };
+    nav.appendChild(btn);
+  }
+}
+
+function buildStreakDots() {
+  const el = document.getElementById('streakDots');
+  el.innerHTML = '';
+  for (let i = 1; i <= 15; i++) {
+    const key = `day${i}`;
+    const logged = loggedMeals[key] || {};
+    const both = logged.lunch && logged.dinner;
+    const partial = logged.lunch || logged.dinner;
+    const dot = document.createElement('div');
+    dot.style.cssText = `width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;cursor:pointer;border:1px solid var(--border);`;
+    if (both) {
+      dot.style.background = '#52b788'; dot.style.color = 'white'; dot.style.border = 'none';
+    } else if (partial) {
+      dot.style.background = '#fef3e2'; dot.style.color = '#c77d2a';
+    } else {
+      dot.style.background = 'var(--surface2)'; dot.style.color = 'var(--muted)';
+    }
+    dot.textContent = i;
+    dot.title = `Day ${i}: ${both ? 'Complete' : partial ? 'Partial' : 'Not logged'}`;
+    dot.onclick = () => { currentDay = i; renderAll(); };
+    el.appendChild(dot);
+  }
+}
+
+function renderMeals() {
+  const dayData = MEALS[currentDay - 1];
+  const key = getTodayKey();
+  const logged = loggedMeals[key] || {};
+
+  document.getElementById('dayLabel').textContent = `Day ${currentDay}`;
+
+  const content = document.getElementById('mealContent');
+  content.innerHTML = `
+    <div class="meal-section">
+      <div class="meal-label">🌅 Lunch / First Meal</div>
+      <div class="meal-block">
+        <div class="meal-name">${dayData.lunch.name}</div>
+        <div class="meal-items">${dayData.lunch.items}</div>
+        <div class="meal-macros">
+          <span class="macro-pill mp-cal">🔥 ${dayData.lunch.cal} kcal</span>
+          <span class="macro-pill mp-p">🥩 ${dayData.lunch.protein}g protein</span>
+          <span class="macro-pill mp-c">🍚 ${dayData.lunch.carbs}g carbs</span>
+          <span class="macro-pill mp-f">🫒 ${dayData.lunch.fat}g fat</span>
+        </div>
+        <div class="meal-tip">💡 ${dayData.lunch.tip}</div>
+        <button class="log-btn ${logged.lunch ? 'logged' : ''}" id="lunchBtn" onclick="toggleLog('lunch')">
+          ${logged.lunch ? '✓ Lunch Logged' : '+ Log Lunch'}
+        </button>
+      </div>
+    </div>
+    <div class="meal-section">
+      <div class="meal-label">🌆 Dinner / Second Meal</div>
+      <div class="meal-block">
+        <div class="meal-name">${dayData.dinner.name}</div>
+        <div class="meal-items">${dayData.dinner.items}</div>
+        <div class="meal-macros">
+          <span class="macro-pill mp-cal">🔥 ${dayData.dinner.cal} kcal</span>
+          <span class="macro-pill mp-p">🥩 ${dayData.dinner.protein}g protein</span>
+          <span class="macro-pill mp-c">🍚 ${dayData.dinner.carbs}g carbs</span>
+          <span class="macro-pill mp-f">🫒 ${dayData.dinner.fat}g fat</span>
+        </div>
+        <div class="meal-tip">💡 ${dayData.dinner.tip}</div>
+        <button class="log-btn ${logged.dinner ? 'logged' : ''}" id="dinnerBtn" onclick="toggleLog('dinner')">
+          ${logged.dinner ? '✓ Dinner Logged' : '+ Log Dinner'}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderMacros() {
+  const dayData = MEALS[currentDay - 1];
+  const key = getTodayKey();
+  const logged = loggedMeals[key] || {};
+
+  let cal = 0, protein = 0, carbs = 0, fat = 0;
+  if (logged.lunch) { cal += dayData.lunch.cal; protein += dayData.lunch.protein; carbs += dayData.lunch.carbs; fat += dayData.lunch.fat; }
+  if (logged.dinner) { cal += dayData.dinner.cal; protein += dayData.dinner.protein; carbs += dayData.dinner.carbs; fat += dayData.dinner.fat; }
+
+  document.getElementById('totalCal').textContent = cal;
+  document.getElementById('totalProtein').textContent = protein + 'g';
+  document.getElementById('totalCarbs').textContent = carbs + 'g';
+  document.getElementById('totalFat').textContent = fat + 'g';
+
+  const pCal = Math.min(100, Math.round(cal / TARGETS.cal * 100));
+  const pP = Math.min(100, Math.round(protein / TARGETS.protein * 100));
+  const pC = Math.min(100, Math.round(carbs / TARGETS.carbs * 100));
+  const pF = Math.min(100, Math.round(fat / TARGETS.fat * 100));
+
+  document.getElementById('barCal').style.width = pCal + '%';
+  document.getElementById('barP').style.width = pP + '%';
+  document.getElementById('barC').style.width = pC + '%';
+  document.getElementById('barF').style.width = pF + '%';
+
+  document.getElementById('pctCal').textContent = pCal + '%';
+  document.getElementById('pctP').textContent = pP + '%';
+  document.getElementById('pctC').textContent = pC + '%';
+  document.getElementById('pctF').textContent = pF + '%';
+
+  renderWater();
+}
+
+function renderWater() {
+  const key = getTodayKey();
+  const logs = waterLogs[key] || [];
+  const total = logs.reduce((s, e) => s + e.amount, 0);
+
+  const pct = Math.min(100, Math.round(total / TARGETS.water * 100));
+  document.getElementById('barWater').style.width = pct + '%';
+  document.getElementById('pctWater').textContent = total + ' / 2,000ml';
+
+  const list = document.getElementById('waterLogList');
+  list.innerHTML = logs.map(e => `<div class="water-entry">💧 ${e.amount}ml — ${e.time}</div>`).join('');
+}
+
+function renderNotes() {
+  const key = getTodayKey();
+  const note = savedNotes[key] || '';
+  document.getElementById('notesArea').value = note;
+
+  const list = document.getElementById('savedNotesList');
+  const allNotes = Object.entries(savedNotes).filter(([k, v]) => v).slice(-3).reverse();
+  if (allNotes.length) {
+    list.innerHTML = '<p style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Recent notes:</p>' +
+      allNotes.map(([k, v]) => `<div style="font-size:0.78rem;margin-bottom:6px;padding:8px;background:var(--surface2);border-radius:8px;"><strong>${k.replace('day','Day ')}:</strong> ${v}</div>`).join('');
+  }
+}
+
+function toggleLog(meal) {
+  const key = getTodayKey();
+  if (!loggedMeals[key]) loggedMeals[key] = {};
+  loggedMeals[key][meal] = !loggedMeals[key][meal];
+  localStorage.setItem('loggedMeals', JSON.stringify(loggedMeals));
+  const name = MEALS[currentDay - 1][meal].name;
+  showToast(loggedMeals[key][meal] ? `✓ ${name} logged!` : `Removed from log`);
+  renderAll();
+}
+
+function logWater() {
+  const input = document.getElementById('waterInput');
+  const amount = parseInt(input.value);
+  if (!amount || amount <= 0) { showToast('Enter a valid amount in ml'); return; }
+  const key = getTodayKey();
+  if (!waterLogs[key]) waterLogs[key] = [];
+  const now = new Date();
+  waterLogs[key].push({ amount, time: now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') });
+  localStorage.setItem('waterLogs', JSON.stringify(waterLogs));
+  input.value = '';
+  showToast(`💧 +${amount}ml logged!`);
+  renderWater();
+}
+
+function saveNotes() {
+  const key = getTodayKey();
+  savedNotes[key] = document.getElementById('notesArea').value;
+  localStorage.setItem('savedNotes', JSON.stringify(savedNotes));
+  showToast('Notes saved!');
+  renderNotes();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['meals', 'shopping', 'notes'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function renderAll() {
+  buildDayNav();
+  buildStreakDots();
+  renderMeals();
+  renderMacros();
+  renderNotes();
+}
+
+document.getElementById('waterInput').addEventListener('keydown', e => { if (e.key === 'Enter') logWater(); });
+
+renderAll();
+</script>
+</body>
+</html>
